@@ -1,9 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useReducer } from "react";
+import { filterReducer } from "../reducer/Reducer";
 
 export const useGetBible = () => {
+	const [filterState, filterDispatch] = useReducer(filterReducer, {
+		category: "web",
+		searchQuery: "John 3:16"
+	});
+
 	const {data, refetch, isLoading: isBibleLoading} = useQuery(["bible"], async () => {
-		return axios.get(`https://bible-api.com/romans 12:1-2,5-7,9,13:1-9&10`).then(res => res.data)
+		return axios.get(`https://bible-api.com/${filterState.searchQuery}?translation=${filterState.category}`).then(res => res.data)
 	});
 
 	const refetchData = () => {
@@ -11,5 +18,5 @@ export const useGetBible = () => {
 		refetch();
 	};
 
-	return { data, refetchData, isBibleLoading}
+	return { data, refetchData, isBibleLoading, filterState, filterDispatch}
 }
